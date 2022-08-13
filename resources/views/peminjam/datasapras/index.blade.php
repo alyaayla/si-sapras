@@ -26,7 +26,7 @@
                                 <th>Qty</th>
                                 <th>Satuan</th>
                                 <th>Gambar</th>
-                                <th>Tanggal</th>
+                                {{-- <th>Tanggal</th> --}}
                                 {{-- <th>Action</th> --}}
                             </tr>
                        
@@ -40,7 +40,7 @@
                         <td>{{ $sapras->qty }}</td>
                         <td>{{ $sapras->satuan }}</td>
                         <td><img src="/image/{{ $sapras->gambar }}" width="100px"></td>
-                        <td>{{ $sapras->created_at->format('d-m-Y') }}</td>
+                        {{-- <td>{{ $sapras->created_at->format('d-m-Y') }}</td> --}}
                         {{-- <td class="text-center">
                             <a href="{{ route('sapras.edit', $sapras->id)}}" class="btn btn-warning btn-sm"><i class="fa fa-edit"></i></a>
 

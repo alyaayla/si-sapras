@@ -74,7 +74,8 @@ $( document ).ready(function() {
                 dataType: "json",
                 success:function(data)
                 {
-                    if(data){
+                if(data){
+                    $('.nama_sapras').empty();
                     var costumHtml = '';
                     $.each(data, function(key, ruangan){
                         costumHtml = costumHtml + '<div class="d-flex flex-row ml-4"><input class="form-check-input" name="sapras_id[]" type="checkbox" value="'+ ruangan.id +'" id="flexCheckDefault"><label class="form-check-label text-capitalize" for="flexCheckDefault">' + ruangan.namasapras+ ' <input type="text" name="qty[]" class="form-control" id="text" placeholder="Enter Qty" ></label></div>';
@@ -82,7 +83,7 @@ $( document ).ready(function() {
                     });
                     $('.nama_sapras').append(costumHtml);
                 }else{
-                    $('#course').empty();
+                    $('.nama_sapras').empty();
                 }
                 }
             });

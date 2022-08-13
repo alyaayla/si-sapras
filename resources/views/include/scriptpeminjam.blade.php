@@ -6,3 +6,4 @@
 
   <!-- Template Main JS File -->
   <script src="assets1/js/main.js"></script>
+  <script src="{{ asset('../js/iziToast.js') }}"></script>

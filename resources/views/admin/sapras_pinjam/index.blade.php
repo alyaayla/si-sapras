@@ -10,7 +10,6 @@
                                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                     <thead>
                                         <tr>
-                                            
                                             <th>Barang</th>
                                             <th>Jumlah Pinjam</th>
                                         </tr>
@@ -19,7 +18,7 @@
                                    <tbody>
                                    @forelse ($datas as $data)
                                 <tr>
-                                    <td>{{ $data->sapras->namasapras }}</td>
+                                    <td>{{ $data->sapras_id }}</td>
                                     <td>{{ $data->qty }}</td>
                                 </tr>
                                 @empty

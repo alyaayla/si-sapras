@@ -31,6 +31,9 @@ Route::get('/dasboard/admin', function () {
 Route::resource('/sapras', SaprasController::class);
 
 Route::resource('/peminjaman', PeminjamanController::class);
+Route::get('/fetchAll-peminjaman', [PeminjamanController::class, 'fetchAll'])->name('fetchAllPeminjaman');
+Route::post('/update-peminjaman', [PeminjamanController::class, 'updatePinjam'])->name('admin.updatePinjam');
+Route::delete('/delete-peminjaman', [PeminjamanController::class, 'destroy'])->name('admin.deletePinjam');
 
 // Route::resource('/sapraspinjam', SaprasPinjamController::class);
 
@@ -79,9 +82,10 @@ Route::resource('/datapinjam', PeminjamanPeminjamController::class);
 
 Route::get('/datasapraspinjam/{id}', [App\Http\Controllers\Peminjam\SaprasPinjamPeminjamController::class, 'index']);
 
-Route::get('formpinjam', function () {
-    return view('peminjam.formpinjam.index');
-});
+// Peminjam Barang
+Route::get('/formpinjam', [App\Http\Controllers\Peminjam\FormPeminjamController::class, 'index']);
+Route::post('/formpinjam', [App\Http\Controllers\Peminjam\FormPeminjamController::class, 'pinjam'])->name('form.peminjam.create');
+
 
 Route::get('matrixadmin', function () {
     return view('admin.index');

@@ -16,7 +16,6 @@ class SaprasPeminjamController extends Controller
      */
     public function index()
     {
-
         $saprass = Sapras::latest()->get();
         return view('peminjam.datasapras.index', compact('saprass'));
     }

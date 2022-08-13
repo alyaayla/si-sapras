@@ -9,10 +9,11 @@ class Peminjaman extends Model
 {
     use HasFactory;
 
-    protected $guarded = ('id');
+    protected $table = "peminjamen";
+    protected $guarded = ['id'];
 
     public function sapras(){
-        return $this->belongsTo(Sapras::class);
+        return $this->belongsTo(Sapras::class, 'sapras_id');
     }
 
     public function ruangan(){

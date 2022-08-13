@@ -9,7 +9,7 @@ class Sapras extends Model
 {
     use HasFactory;
 
-    protected $guarded = ('id');
+    protected $guarded = ['id'];
 
     public function peminjaman(){
         return $this->hasMany(Peminjaman::class);

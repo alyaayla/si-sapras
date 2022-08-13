@@ -15,5 +15,7 @@
 
   <!-- Template Main CSS File -->
   <link href="assets1/css/style.css" rel="stylesheet">
+  <link href="{{ asset('../css/iziToast.css') }}" rel="stylesheet">
+<link href="{{asset('admin/vendor/fontawesome-free/css/all.min.css')}}" rel="stylesheet" type="text/css">
 
   

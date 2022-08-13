@@ -27,8 +27,9 @@
 						<div class="img" style="background-image: url(assetslogin/images/dok2.jpg);"></div>
 						<div class="login-wrap p-4 p-md-5">
 			      	<div class="d-flex">
-			      		<div class="w-100">
-			      			<h3 class="mb-4">Sign In</h3>
+			      		<div class="w-100 text-center">
+			      			<h3 class="mb-4">Login Si-Sapras</h3>
+							  <h4 class="mb-4">Yayasan Pendidikan An-Nadhir</h4>
 			      		</div>
 								{{-- <div class="w-100">
 									<p class="social-media d-flex justify-content-end">

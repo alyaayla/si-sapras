@@ -15,9 +15,9 @@ class CreateSaprasPinjamsTable extends Migration
     {
         Schema::create('sapras_pinjams', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('peminjaman_id')->nullbable();
-            $table->foreignId('sapras_id')->nullbable();
-            $table->integer('qty')->nullbable();
+            $table->foreignId('peminjaman_id')->nullable();
+            $table->foreignId('sapras_id')->nullable();
+            $table->integer('qty')->nullable();
             $table->timestamps();
         });
     }

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Peminjaman;
 use App\Models\SaprasPinjam;
 use App\Models\Ruangan;
+use App\Models\Sapras;
 use Carbon\Carbon;
 
 class PeminjamanController extends Controller
@@ -17,9 +18,84 @@ class PeminjamanController extends Controller
      */
     public function index()
     {
-        $peminjaman = Peminjaman::latest()->get();
-        return view('admin.peminjaman.index', compact('peminjaman'));
+        return view('admin.peminjaman.index');
     }
+
+    public function fetchAll(Request $request)
+    {
+		if(!empty($request->from_date))
+        {
+            $peminjaman = Peminjaman::whereBetween('created_at', array($request->from_date, $request->to_date))
+                    ->orderBy('created_at', 'desc')
+                    ->get();
+        }
+        else
+        {
+            $peminjaman = Peminjaman::latest()->get();
+        }
+		$output = '';
+		if ($peminjaman->count() > 0) {
+			$output .= '<table class="p-0 table table-striped table-sm text-center align-middle">
+            <thead class="text-darken">
+                <th>No.</th>
+                <th>
+                    Name Peminjam
+                </th>
+                <th class="text-center">
+                    Tanggal
+                </th>
+                <th class="text-center">
+                    Ruangan
+                </th>
+                <th class="text-center">
+                    Sapras
+                </th>
+                <th class="text-center">
+                    Status
+                </th>
+                <th class="text-center">
+                    Aksi
+                </th>
+            </thead>
+            <tbody>';
+            $nomor=1;
+			foreach ($peminjaman as $pinjam) {
+                $output .= '<tr>';
+                $output .= '<td>' . $nomor++ . '</td>';
+                $output .= '<td>
+                    <div class="d-flex flex-column justify-content-center">
+                        <p class="m-0 text-sm font-weight-bold">'. $pinjam->nama_peminjam .'</p>
+                    </td>
+                    <td class="align-middle text-center">
+                        <p class="text-sm font-weight-bold m-0">
+                            '. $pinjam->created_at->format('d-m-Y') .'</p>
+                        </td>
+                    <td class="align-middle text-center text-sm">
+                        <p class="m-0 text-sm">'. $pinjam->ruangan->name .'</p>
+                    </td>
+                    <td class="align-middle text-center">
+                        <a href="/sapras_pinjam/'.$pinjam->id.'" class="btn btn-primary btn-sm">
+                            Data Barang
+                        </a>
+                    </td>
+                    <td class="align-middle text-center">
+                        <span
+                            class="text-sm font-weight-bold text-capitalize">'. $pinjam->status .'</span>
+                    </td>
+                    <td class="align-middle text-center">
+                        <a href="#" id="'. $pinjam->id .'" class="btn btn-warning btn-sm editPinjam"><i
+                            class="fa fa-recycle"></i></a>
+                        <a href="#" id="'. $pinjam->id .'" class="btn btn-danger btn-sm hapusPinjam"><i
+                            class="fa fa-trash"></i></a>
+                    </td>
+                </tr>';
+			}
+			$output .= '</tbody></table>';
+			echo $output;
+		} else {
+			echo '<h1 class="text-center text-secondary my-5">Tidak ada data Peminjaman!</h1>';
+		}
+	}
 
     /**
      * Show the form for creating a new resource.
@@ -40,7 +116,6 @@ class PeminjamanController extends Controller
      */
     public function store(Request $request)
     {
-
         $data_peminjam = new Peminjaman();
         $data_peminjam->nama_peminjam = $request->nama_peminjam;
         $data_peminjam->ruangan_id = $request->ruangan_id;
@@ -48,22 +123,26 @@ class PeminjamanController extends Controller
         $data_peminjam->status = "Sedang Dipinjam";
         $data_peminjam->save();
 
-
         $sapras_id = $request->input('sapras_id', []);
         $qty = $request->input('qty', []);
-
-
+        $units = [];
         foreach ($sapras_id as $index => $unit) 
         {
-            $data_pemindam = new SaprasPinjam();
-            $data_pemindam->peminjaman_id = $data_peminjam->id;
-            $data_pemindam->sapras_id = $unit;
-            $data_pemindam->qty = $qty[$index];
-            $data_pemindam->save();   
+            $units[] = [
+                'peminjaman_id' => $data_peminjam->id,
+                'sapras_id' => $sapras_id[$index],
+                'qty' => $qty[$index],
+            ];
+
+            $sapras = Sapras::where('id', $unit)->first();
+            $sapras->qty = $sapras->qty - $qty[$index];
+            $sapras->update();
         }
+        // dd($units);
+        SaprasPinjam::insert($units);
 
         return redirect()->route('peminjaman.index')
-                        ->with('success','Product created successfully.');
+                        ->with('success','peminjaman created successfully.');
     }
 
     /**
@@ -106,12 +185,29 @@ class PeminjamanController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
+        $id = $request->id;
         $peminjaman = Peminjaman::find($id);
-
         $peminjaman->delete();
- 
-        return redirect()->route('peminjaman.index')->with(['succes' => 'Data Berhasil Dihapus']);
+    }
+
+    public function updatePinjam(Request $request)
+    {
+        $id = $request->id;
+
+        $check = Peminjaman::where('id', $id)->where('status', '!=', 'Dikembalikan')->exists();
+        if ($check) {
+            $data_peminjam = Peminjaman::where('id', $id)->first();
+            $data_peminjam->status = "Dikembalikan";
+            $data_peminjam->update();
+
+            $saprasPinjam = SaprasPinjam::where('peminjaman_id', $data_peminjam->id)->get();
+            foreach ($saprasPinjam as $value) {
+                $sapras = Sapras::where('id', $value->sapras_id)->first();
+                $sapras->qty = $sapras->qty + $value->qty;
+                $sapras->update();
+            }
+        }
     }
 }
