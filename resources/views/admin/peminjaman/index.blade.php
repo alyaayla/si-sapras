@@ -28,7 +28,7 @@
             <h6 class="m-0 font-weight-bold text-primary"></h6>
             <a href="{{route('peminjaman.create')}}" class="btn"><i class="fa fa-plus"></i> create</a>
         </div>
-        <div class="card-body">
+        <div class="card-body"                                                                                          >
             <div class="row align-items-center input-daterange mb-4">
                 <div class="col-md-4">
                     <input type="text" name="from_date" id="from_date" class="form-control" placeholder="Dari Tanggal"

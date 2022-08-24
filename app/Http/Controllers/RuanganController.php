@@ -41,15 +41,13 @@ class RuanganController extends Controller
             'name' => 'required',
 
         ]);
-    
-       
 
         $ruangan = new Ruangan();
         $ruangan->name = $request->name;
         $ruangan->save();
 
-        return redirect()->route('ruangan.index')
-                        ->with('success','Product created successfully.');
+        notify()->success("Ruangan berhasil ditambahkan","Success","topRight");
+        return redirect()->route('ruangan.index');
     }
 
     /**
@@ -93,8 +91,8 @@ class RuanganController extends Controller
         
         $ruangan->update();
 
-        return redirect()->route('ruangan.index')
-                        ->with('success','Product created successfully.');
+        notify()->success("Ruangan berhasil diperbarui","Success","topRight");
+        return redirect()->route('ruangan.index');
     }
 
     /**
@@ -103,12 +101,10 @@ class RuanganController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
+        $id = $request->id;
         $ruangan = Ruangan::find($id);
-
         $ruangan->delete();
- 
-        return redirect()->route('ruangan.index')->with(['succes' => 'Data Berhasil Dihapus']);
     }
 }

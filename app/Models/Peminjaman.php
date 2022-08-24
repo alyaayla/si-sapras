@@ -16,6 +16,10 @@ class Peminjaman extends Model
         return $this->belongsTo(Sapras::class, 'sapras_id');
     }
 
+    public function user(){
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
     public function ruangan(){
         return $this->belongsTo(Ruangan::class);
     }

@@ -57,8 +57,13 @@
                         <div class="form-group">
                             <label for="is_admin">Role</label>
                             <select class="form-control select2" id="is_admin" name="is_admin" required>
-                            <option value="1">Admin</option>
-                            <option value="0">Peminjam</option>
+                                @if ( $user->is_admin == 1)
+                                    <option selected value="1">Admin</option>
+                                    <option value="0">Peminjam</option>
+                                @elseif ( $user->is_admin == 0)
+                                    <option value="1">Admin</option>
+                                    <option selected value="0">Peminjam</option>
+                                @endif
                             </select>
                         </div>
                         

@@ -106,8 +106,6 @@
                                 @enderror
                             </div>
 
-                            
-    
                             <div class="mb-3">
                                 <label for="email">Email</label>
                                 <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email">

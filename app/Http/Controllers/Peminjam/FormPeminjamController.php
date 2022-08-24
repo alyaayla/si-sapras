@@ -21,15 +21,19 @@ class FormPeminjamController extends Controller
     public function pinjam(Request $request)
     {
         $data_peminjam = new Peminjaman();
-        $data_peminjam->nama_peminjam = $request->nama_peminjam;
+        $data_peminjam->user_id = auth()->user()->id;
         $data_peminjam->ruangan_id = $request->ruangan_id;
         $data_peminjam->tanggal = $request->tanggal;
         $data_peminjam->status = "Sedang Dipinjam";
         $data_peminjam->save();
-
+        
         $sapras_id = $request->input('sapras_id', []);
         $qty = $request->input('qty', []);
         $units = [];
+        // foreach ($qty as $key => $value) {
+        //     echo $key . '-' . $value;
+        //     echo "<br>";
+        // }
         foreach ($sapras_id as $index => $unit) 
         {
             $units[] = [
@@ -38,13 +42,26 @@ class FormPeminjamController extends Controller
                 'qty' => $qty[$index],
             ];
 
-            $sapras = Sapras::where('id', $unit)->first();
-            $sapras->qty = $sapras->qty - $qty[$index];
-            $sapras->update();
+            $check = Sapras::where('id', $unit)->get();
+            foreach ($check as $key) 
+            {
+                if ($qty[$index] >= $key->qty)
+                {
+                    $data_peminjam = Peminjaman::where('id', $data_peminjam->id)->delete();
+                    notify()->warning("Peminjaman melebihi stok barang!","Gagal","topRight");
+                    return redirect()->back();
+                } 
+                    else
+                {
+                    $sapras = Sapras::where('id', $unit)->first();
+                    $sapras->qty = $sapras->qty - $qty[$index];
+                    $sapras->update();
+                }
+            }
         }
+
         // dd($units);
         SaprasPinjam::insert($units);
-
         notify()->success("Berhasil melakukan peminjaman!","Success","topRight");
         return redirect()->back();
     }

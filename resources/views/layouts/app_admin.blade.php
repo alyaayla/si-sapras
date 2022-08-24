@@ -8,11 +8,12 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>SB Admin 2 - Dashboard</title>
+    <title>Yayasan Pend. An-Nadhir</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <!-- Custom fonts for this template-->
     @include('include.style')
+    <link href="{{ asset('css/iziToast.css') }}" rel="stylesheet">
 </head>
 
 <body id="page-top">
@@ -81,6 +82,7 @@
 
     <!-- Bootstrap core JavaScript-->
     @include('include.script')
+    @include('vendor.lara-izitoast.toast')
 
 </body>
 

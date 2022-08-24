@@ -31,11 +31,11 @@
                                 <label for="namasapras" class="form-label py-1">Nama Sapras</label>
                                 <div class="nama_sapras"></div>
                             </div>
-                            <div class="form-group mb-3">
+                            {{-- <div class="form-group mb-3">
                                 <label for="nama_peminjam" class="py-1">Nama Peminjam</label>
                                 <input type="text" name="nama_peminjam" class="form-control" id="text"
                                     placeholder="Enter Nama Peminjam" required>
-                            </div>
+                            </div> --}}
                             <div class="form-group">
                                 <button class="btn btn-primary btn-sm" type="submit">Save</button>
                                 <button class="btn btn-primary btn-sm" type="reset">Reset</button>
@@ -71,7 +71,7 @@
                                     '<div class="d-flex flex-row ml-4"><input class="form-check-input" name="sapras_id[]" type="checkbox" value="' +
                                     ruangan.id +
                                     '" id="flexCheckDefault"><label class="form-check-label text-capitalize" for="flexCheckDefault">' +
-                                    ruangan.namasapras +
+                                    ruangan.namasapras +  "("+ ruangan.qty +")" +
                                     ' <input type="text" name="qty[]" class="form-control" id="text" placeholder="Enter Qty" ></label></div>';
                                 // $('select[name="sapras_id"]').append('<option value="'+ ruangan.id +'">' + ruangan.namasapras+ '</option>');
                             });

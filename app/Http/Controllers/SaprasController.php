@@ -11,18 +11,99 @@ class SaprasController extends Controller
 {
     public function index()
     {
-        
-        $saprass = Sapras::latest()->get();
-        return view('admin.sapras.index', compact('saprass'));
-        
+        return view('admin.sapras.index');
     }
     
-    public function index_peminjam()
-    {
-        $saprass = Sapras::latest()->get();
-        return view('admin.sapras.index', compact('saprass'));
+    // public function index_peminjam()
+    // {
+    //     $saprass = Sapras::latest()->get();
+    //     return view('admin.sapras.index', compact('saprass'));
         
-    }
+    // }
+
+    public function fetchAll(Request $request)
+    {
+		if(!empty($request->from_date))
+        {
+            $sapras = Sapras::whereBetween('created_at', array($request->from_date, $request->to_date))
+                    ->orderBy('created_at', 'desc')
+                    ->get();
+        }
+        else
+        {
+            $sapras = Sapras::latest()->get();
+        }
+		$output = '';
+		if ($sapras->count() > 0) {
+			$output .= '<table class="p-0 table table-striped table-sm text-center align-middle">
+            <thead class="text-darken">
+                <th>No.</th>
+                <th>
+                    Kode
+                </th>
+                <th class="text-center">
+                    Nama Sapras
+                </th>
+                <th class="text-center">
+                    Ruangan
+                </th>
+                <th class="text-center">
+                    Qty
+                </th>
+                <th class="text-center">
+                    Satuan
+                </th>
+                <th class="text-center">
+                    Gambar
+                </th>
+                <th class="text-center">
+                    Tanggal Peminjaman
+                </th>
+                <th class="text-center">
+                    Action
+                </th>
+            </thead>
+            <tbody>';
+            $nomor=1;
+			foreach ($sapras as $pinjam) {
+                $output .= '<tr>';
+                $output .= '<td>' . $nomor++ . '</td>';
+                $output .= '<td>
+                        <p class="m-0 text-sm font-weight-bold">'. $pinjam->kode .'</p>
+                    </td>
+                    <td>
+                        <p class="m-0 text-sm font-weight-bold">'. $pinjam->namasapras .'</p>
+                    </td>
+                    <td>
+                        <p class="m-0 text-sm font-weight-bold">'. $pinjam->ruangan->name .'</p>
+                    </td>
+                    <td>
+                        <p class="m-0 text-sm font-weight-bold">'. $pinjam->qty .'</p>
+                    </td>
+                    <td>
+                        <p class="m-0 text-sm font-weight-bold">'. $pinjam->satuan .'</p>
+                    </td>
+                    <td>
+                        <img src="/image/'. $pinjam->gambar.'" width="100px">
+                    </td>
+                    <td>
+                        <p class="text-sm font-weight-bold m-0">
+                            '. $pinjam->created_at->format('d-m-Y') .'</p>
+                    </td>
+                    <td class="align-middle text-center">
+                        <a href="sapras/'.$pinjam->id.'/edit/" class="btn btn-warning btn-sm"><i
+                            class="fa fa-edit"></i></a>
+                        <a href="#" id="'. $pinjam->id .'" class="btn btn-danger btn-sm hapusSapras"><i
+                            class="fa fa-trash"></i></a>
+                    </td>
+                </tr>';
+			}
+			$output .= '</tbody></table>';
+			echo $output;
+		} else {
+			echo '<h1 class="text-center text-secondary my-5">Tidak ada data Sapras!</h1>';
+		}
+	}
 
     public function create()
     {
@@ -55,9 +136,9 @@ class SaprasController extends Controller
             $sapras['gambar'] = "$profileImage";
         }
         $sapras->save();
-
-        return redirect()->route('sapras.index')
-                        ->with('success','Product created successfully.');
+        
+        notify()->success("Sapras berhasil ditambahkan","Success","topRight");
+        return redirect()->route('sapras.index');
     }
 
     /**
@@ -119,8 +200,8 @@ class SaprasController extends Controller
         }
         $sapras->update();
 
-        return redirect()->route('sapras.index')
-                        ->with('success','Product created successfully.');
+        notify()->success("Sapras berhasil diperbarui","Success","topRight");
+        return redirect()->route('sapras.index');
     }
 
     /**
@@ -129,12 +210,10 @@ class SaprasController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-       $saprass = Sapras::find($id);
-
-       $saprass->delete();
-
-       return redirect()->route('sapras.index')->with(['succes' => 'Data Berhasil Dihapus']);
+        $id = $request->id;
+        $saprass = Sapras::find($id);
+        $saprass->delete();
     }
 }

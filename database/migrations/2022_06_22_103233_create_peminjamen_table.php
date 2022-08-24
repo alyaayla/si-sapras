@@ -15,9 +15,9 @@ class CreatePeminjamenTable extends Migration
     {
         Schema::create('peminjamen', function (Blueprint $table) {
             $table->id();
-            // $table->foreignId('user_id');
+            $table->foreignId('user_id');
             $table->foreignId('ruangan_id');
-            $table->string('nama_peminjam');
+            // $table->string('nama_peminjam');
             $table->datetime('tanggal');
             $table->string('status');
             $table->timestamps();

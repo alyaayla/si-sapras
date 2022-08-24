@@ -15,7 +15,7 @@ class SaprasPinjamPeminjamController extends Controller
      */
     public function index($id)
     {
-        $datas = sapraspinjam::where('peminjaman_id', $id)->latest()->get();
+        $datas = SaprasPinjam::where('peminjaman_id', $id)->latest()->get();
         // return view('admin.peminjaman.index', compact('peminjaman'));
         return view('peminjam.datasapraspinjam.index', compact('datas'));
         // return $data;

@@ -16,7 +16,6 @@ class UserController extends Controller
      */
     public function index()
     {
-
         $user = User::latest()->get();
         return view('admin.user.index', compact('user'));
     }
@@ -56,8 +55,8 @@ class UserController extends Controller
         // return view('admin.user.index')
         // ->with('success','User berhasil ditambahkan');
 
-        return redirect()->route('user.index')
-                        ->with('success','Product created successfully.');
+        notify()->success("User berhasil ditambahkan","Success","topRight");
+        return redirect()->route('user.index');
     }
 
     /**
@@ -104,11 +103,13 @@ class UserController extends Controller
         $user->name = $request->name;
         $user->email = $request->email;
         $user->is_admin = $request->is_admin;
-        $user->password = Hash::make($request->password);
+        if ($request->password) {
+            $user->password = Hash::make($request->password);
+        }
         $user->update();
 
-        return redirect()->route('user.index')
-                        ->with('success','User created successfully.');
+        notify()->success("User berhasil diperbarui","Success","topRight");
+        return redirect()->route('user.index');
     }
 
     /**
@@ -117,12 +118,10 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
+        $id = $request->id;
         $user = User::find($id);
-
         $user->delete();
- 
-        return redirect()->route('user.index')->with(['success' => 'Data Berhasil Dihapus']);
     }
 }

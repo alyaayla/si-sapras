@@ -17,9 +17,7 @@
                 <h1 class="mb-2 ">Tabel Data Sarana dan Prasarana</h1>
                 <div class="table-responsive">
                     <table class="table table-bordered" id="dataTable" width="60%" cellspacing="0">
-                        
                             <tr>
-                                
                                 <th>Kode</th>
                                 <th>Nama Sapras</th>
                                 <th>Ruangan</th>

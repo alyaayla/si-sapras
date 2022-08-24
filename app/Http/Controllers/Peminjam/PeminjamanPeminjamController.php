@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\Peminjaman;
 use App\Models\Ruangan;
 use App\Models\Sapras;
+use App\Models\SaprasPinjam;
+use PDF;
 
 class PeminjamanPeminjamController extends Controller
 {
@@ -17,7 +19,7 @@ class PeminjamanPeminjamController extends Controller
      */
     public function index()
     {
-        $peminjaman = Peminjaman::latest()->get();
+        $peminjaman = Peminjaman::where('user_id', auth()->user()->id)->latest()->get();
         return view('peminjam.datapinjam.index', compact('peminjaman'));
     }
 
@@ -73,7 +75,7 @@ class PeminjamanPeminjamController extends Controller
      */
     public function show($id)
     {
-        //
+        
     }
 
     /**
@@ -108,5 +110,30 @@ class PeminjamanPeminjamController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    // handle edit an employee ajax request
+	public function detail(Request $request) 
+    {
+		$id = $request->id;
+		$emp = SaprasPinjam::with('sapras')->where('peminjaman_id', $id)->get();
+		return response()->json($emp);
+	}
+
+    public function print($id)
+    {
+        $peminjaman = SaprasPinjam::where('peminjaman_id', $id)->first();
+        $peminjaman = [
+            'title' => 'Bukti Peminjaman',
+            'date' => $peminjaman->peminjaman->created_at->format('d-M-Y'),
+            'nama_peminjam' => $peminjaman->peminjaman->user->name,
+            'ruangan' => $peminjaman->peminjaman->ruangan->name,
+            'sapras' => $peminjaman->sapras->namasapras,
+            'status' => $peminjaman->peminjaman->status,
+        ];
+           
+        $pdf = PDF::loadView('peminjam.datapinjam.print', $peminjaman);
+     
+        return $pdf->download('bukti-peminjaman.pdf');
     }
 }

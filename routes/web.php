@@ -20,20 +20,33 @@ use App\Http\Controllers\Peminjam\SaprasPinjamPeminjamController;
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::group(['middleware' => ['is_admin', 'auth']], function() 
+{
+    Route::get('/dasboard/admin', function () {
+        return view('admin.index');
+    });
+
+    Route::resource('/sapras', SaprasController::class);
+    Route::get('/fetchAll-sapras', [SaprasController::class, 'fetchAll'])->name('fetchAllSapras');
+    Route::delete('/delete-sapras', [SaprasController::class, 'destroy'])->name('admin.deleteSapras');
+
+    Route::resource('/peminjaman', PeminjamanController::class);
+    Route::get('/fetchAll-peminjaman', [PeminjamanController::class, 'fetchAll'])->name('fetchAllPeminjaman');
+    Route::post('/update-peminjaman', [PeminjamanController::class, 'updatePinjam'])->name('admin.updatePinjam');
+    Route::delete('/delete-peminjaman', [PeminjamanController::class, 'destroy'])->name('admin.deletePinjam');
+
+    Route::resource('/ruangan', RuanganController::class);
+    Route::delete('/delete-ruangan', [RuanganController::class, 'destroy'])->name('admin.deleteRuangan');
+
+    Route::resource('/user', UserController::class);
+    Route::delete('/delete-user', [UserController::class, 'destroy'])->name('admin.deleteUser');
+
+    Route::get('admin/home', [HomeController::class, 'adminHome'])->name('admin.home')->middleware('is_admin');
+});
+
 Route::get('/', function () {
     return view('auth.login');
 });
-
-Route::get('/dasboard/admin', function () {
-    return view('admin.index');
-});
-
-Route::resource('/sapras', SaprasController::class);
-
-Route::resource('/peminjaman', PeminjamanController::class);
-Route::get('/fetchAll-peminjaman', [PeminjamanController::class, 'fetchAll'])->name('fetchAllPeminjaman');
-Route::post('/update-peminjaman', [PeminjamanController::class, 'updatePinjam'])->name('admin.updatePinjam');
-Route::delete('/delete-peminjaman', [PeminjamanController::class, 'destroy'])->name('admin.deletePinjam');
 
 // Route::resource('/sapraspinjam', SaprasPinjamController::class);
 
@@ -45,7 +58,6 @@ Route::get('getCourse/{id}', function ($id) {
     }
 });
 
-Route::resource('/ruangan', RuanganController::class);
 // Route::get('/peminjaman/admin', function () {
 //     return view('admin.peminjaman.index');
 // });
@@ -54,38 +66,40 @@ Route::resource('/ruangan', RuanganController::class);
 //     return view('admin.user.index');
 // });
 
-Route::resource('/user', UserController::class);
-
 // Route::get('/sapras/admin', function () {
 //     return view('admin.sapras.index');
 // });
+Route::group(['middleware' => ['is_admin', 'auth']], function() 
+{
+    Route::get('peminjam', function () {
+        return view('peminjam.index');
+    });
 
-Route::get('peminjam', function () {
-    return view('peminjam.index');
+    Route::get('about', function () {
+        return view('peminjam.about.index');
+    });
+
+    Route::resource('/datasapras', SaprasPeminjamController::class);
+    Route::resource('/datapinjam', PeminjamanPeminjamController::class);
+    Route::get('/datapinjam-detail', [PeminjamanPeminjamController::class, 'detail'])->name('datapinjam.detail');
+    Route::get('/datasapraspinjam/{id}', [App\Http\Controllers\Peminjam\SaprasPinjamPeminjamController::class, 'index']);
+
+    // Peminjam Barang
+    Route::get('/formpinjam', [App\Http\Controllers\Peminjam\FormPeminjamController::class, 'index']);
+    Route::post('/formpinjam', [App\Http\Controllers\Peminjam\FormPeminjamController::class, 'pinjam'])->name('form.peminjam.create');
+
+    Route::get('print/{id}', [PeminjamanPeminjamController::class, 'print']);
+
+    // Peminjaman
+    Route::get('sapras_pinjam/{id}', [App\Http\Controllers\SaprasPinjamController::class, 'index']);
 });
-
-Route::get('about', function () {
-    return view('peminjam.about.index');
-});
-
 // Route::get('datasapras', function () {
 //     return view('peminjam.datasapras.index');
 // });
 
-Route::resource('/datasapras', SaprasPeminjamController::class);
-
 // Route::get('datapinjam', function () {
 //     return view('peminjam.datapinjam.index');
 // });
-
-Route::resource('/datapinjam', PeminjamanPeminjamController::class);
-
-Route::get('/datasapraspinjam/{id}', [App\Http\Controllers\Peminjam\SaprasPinjamPeminjamController::class, 'index']);
-
-// Peminjam Barang
-Route::get('/formpinjam', [App\Http\Controllers\Peminjam\FormPeminjamController::class, 'index']);
-Route::post('/formpinjam', [App\Http\Controllers\Peminjam\FormPeminjamController::class, 'pinjam'])->name('form.peminjam.create');
-
 
 Route::get('matrixadmin', function () {
     return view('admin.index');
@@ -93,8 +107,6 @@ Route::get('matrixadmin', function () {
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-
-Route::get('admin/home', [HomeController::class, 'adminHome'])->name('admin.home')->middleware('is_admin');
 
 Route::get('/logout', [HomeController::class, 'logout']);
 
@@ -107,10 +119,6 @@ Route::get('getSarpas/{id}', function ($id) {
     $ruangan = App\Models\Sapras::where('ruangan_id',$id)->get();
     return response()->json($ruangan);
 });
-
-
-// Peminjaman
-Route::get('sapras_pinjam/{id}', [App\Http\Controllers\SaprasPinjamController::class, 'index']);
 
 // Peminjam
 // Route::get('/peminjam/data_sapras', [App\Http\Controllers\SaprasPinjamController::class, 'index']);

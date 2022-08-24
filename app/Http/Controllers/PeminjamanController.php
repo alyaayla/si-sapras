@@ -7,6 +7,7 @@ use App\Models\Peminjaman;
 use App\Models\SaprasPinjam;
 use App\Models\Ruangan;
 use App\Models\Sapras;
+use App\Models\User;
 use Carbon\Carbon;
 
 class PeminjamanController extends Controller
@@ -25,7 +26,7 @@ class PeminjamanController extends Controller
     {
 		if(!empty($request->from_date))
         {
-            $peminjaman = Peminjaman::whereBetween('created_at', array($request->from_date, $request->to_date))
+            $peminjaman = Peminjaman::whereBetween('tanggal', array($request->from_date, $request->to_date))
                     ->orderBy('created_at', 'desc')
                     ->get();
         }
@@ -64,12 +65,13 @@ class PeminjamanController extends Controller
                 $output .= '<td>' . $nomor++ . '</td>';
                 $output .= '<td>
                     <div class="d-flex flex-column justify-content-center">
-                        <p class="m-0 text-sm font-weight-bold">'. $pinjam->nama_peminjam .'</p>
+                        <p class="m-0 text-sm font-weight-bold">'. $pinjam->user->name .'</p>
+                    </div>
                     </td>
                     <td class="align-middle text-center">
                         <p class="text-sm font-weight-bold m-0">
-                            '. $pinjam->created_at->format('d-m-Y') .'</p>
-                        </td>
+                            '. $pinjam->tanggal.'</p>
+                    </td>
                     <td class="align-middle text-center text-sm">
                         <p class="m-0 text-sm">'. $pinjam->ruangan->name .'</p>
                     </td>
@@ -104,8 +106,9 @@ class PeminjamanController extends Controller
      */
     public function create()
     {
+        $user = User::where('is_admin', 0)->latest()->get();
         $ruangan = Ruangan::all();
-        return view('admin.peminjaman.create', compact('ruangan'));
+        return view('admin.peminjaman.create', compact('ruangan', 'user'));
     }
 
     /**
@@ -116,33 +119,75 @@ class PeminjamanController extends Controller
      */
     public function store(Request $request)
     {
+        $this->validate($request,[
+            'qty[]' => 'required',
+        ], [
+            'qty[].required' => 'Kuantiti belum diisi!'
+        ]);
+
         $data_peminjam = new Peminjaman();
-        $data_peminjam->nama_peminjam = $request->nama_peminjam;
+        $data_peminjam->user_id = $request->user_id;
         $data_peminjam->ruangan_id = $request->ruangan_id;
         $data_peminjam->tanggal = $request->tanggal;
         $data_peminjam->status = "Sedang Dipinjam";
         $data_peminjam->save();
-
+        
         $sapras_id = $request->input('sapras_id', []);
         $qty = $request->input('qty', []);
         $units = [];
+        
+        // echo "quantity";
+        // echo "<br>";
+        foreach ($qty as $key => $value) {
+            if ($value != null) {
+                $qtyTotal[] = $value;
+            }
+        }
+
+        // foreach ($qtyTotal as $key => $value) {
+        //     echo $value;
+        //     echo "<br>";
+        // }
+        // echo "<br>";
+        // echo "sapras_id";
+        // echo "<br>";
+        // foreach ($sapras_id as $key => $value) {
+        //     echo $key . '-' . $value;
+        //     echo "<br>";
+        // }
         foreach ($sapras_id as $index => $unit) 
         {
             $units[] = [
                 'peminjaman_id' => $data_peminjam->id,
                 'sapras_id' => $sapras_id[$index],
-                'qty' => $qty[$index],
+                'qty' => $qtyTotal[$index],
             ];
 
-            $sapras = Sapras::where('id', $unit)->first();
-            $sapras->qty = $sapras->qty - $qty[$index];
-            $sapras->update();
+            $check = Sapras::where('id', $unit)->get();
+            foreach ($check as $key) 
+            {
+                if ($qty[$index] > $key->qty)
+                {
+                    $data_peminjam = Peminjaman::where('id', $data_peminjam->id)->delete();
+                    notify()->warning("Peminjaman melebihi stok barang!","Gagal","topRight");
+                    return redirect()->back();
+                } 
+                    else
+                {
+                    $sapras = Sapras::where('id', $unit)->first();
+                    $sapras->qty = $sapras->qty - $qtyTotal[$index];
+                    $sapras->update();
+                    // notify()->success($sapras->qty,"Berhasil","topRight");
+                    // return redirect()->back();
+                }
+            }
         }
-        // dd($units);
+
+        // // dd($units);
         SaprasPinjam::insert($units);
 
-        return redirect()->route('peminjaman.index')
-                        ->with('success','peminjaman created successfully.');
+        notify()->success("Peminjaman berhasil ditambahkan","Success","topRight");
+        return redirect()->route('peminjaman.index');
     }
 
     /**
