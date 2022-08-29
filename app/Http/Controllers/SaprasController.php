@@ -69,26 +69,26 @@ class SaprasController extends Controller
                 $output .= '<tr>';
                 $output .= '<td>' . $nomor++ . '</td>';
                 $output .= '<td>
-                        <p class="m-0 text-sm font-weight-bold">'. $pinjam->kode .'</p>
+                        '. $pinjam->kode .'
                     </td>
                     <td>
-                        <p class="m-0 text-sm font-weight-bold">'. $pinjam->namasapras .'</p>
+                        '. $pinjam->namasapras .'
                     </td>
                     <td>
-                        <p class="m-0 text-sm font-weight-bold">'. $pinjam->ruangan->name .'</p>
+                       '. $pinjam->ruangan->name .'
                     </td>
                     <td>
-                        <p class="m-0 text-sm font-weight-bold">'. $pinjam->qty .'</p>
+                        '. $pinjam->qty .'
                     </td>
                     <td>
-                        <p class="m-0 text-sm font-weight-bold">'. $pinjam->satuan .'</p>
+                       '. $pinjam->satuan .'
                     </td>
                     <td>
                         <img src="/image/'. $pinjam->gambar.'" width="100px">
                     </td>
                     <td>
-                        <p class="text-sm font-weight-bold m-0">
-                            '. $pinjam->created_at->format('d-m-Y') .'</p>
+                        
+                            '. $pinjam->created_at->format('d-m-Y') .'
                     </td>
                     <td class="align-middle text-center">
                         <a href="sapras/'.$pinjam->id.'/edit/" class="btn btn-warning btn-sm"><i
@@ -98,7 +98,27 @@ class SaprasController extends Controller
                     </td>
                 </tr>';
 			}
-			$output .= '</tbody></table>';
+			$output .= '</tbody>
+            <tfoot>
+            <tr>
+            <th>Kode</th>
+            <th>
+                Nama SAPRAS
+            </th>
+            <th class="text-center">
+                Ruangan
+            </th>
+            <th class="text-center">
+                qty
+            </th>
+            <th class="text-center">
+                Satuan
+            </th>
+            <th class="text-center">
+                Gambar
+            </th>
+            </tr>
+        </tfoot></table>';
 			echo $output;
 		} else {
 			echo '<h1 class="text-center text-secondary my-5">Tidak ada data Sapras!</h1>';

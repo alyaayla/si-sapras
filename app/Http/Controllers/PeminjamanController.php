@@ -19,7 +19,8 @@ class PeminjamanController extends Controller
      */
     public function index()
     {
-        return view('admin.peminjaman.index');
+        $peminjaman = Peminjaman::latest()->get();
+        return view('admin.peminjaman.index', compact('peminjaman'));
     }
 
     public function fetchAll(Request $request)
@@ -36,7 +37,7 @@ class PeminjamanController extends Controller
         }
 		$output = '';
 		if ($peminjaman->count() > 0) {
-			$output .= '<table class="p-0 table table-striped table-sm text-center align-middle">
+			$output .= '<table class="p-0 display table table-striped table-sm text-center align-middle">
             <thead class="text-darken">
                 <th>No.</th>
                 <th>
@@ -64,16 +65,13 @@ class PeminjamanController extends Controller
                 $output .= '<tr>';
                 $output .= '<td>' . $nomor++ . '</td>';
                 $output .= '<td>
-                    <div class="d-flex flex-column justify-content-center">
-                        <p class="m-0 text-sm font-weight-bold">'. $pinjam->user->name .'</p>
-                    </div>
+                        '. $pinjam->user->name .'
                     </td>
                     <td class="align-middle text-center">
-                        <p class="text-sm font-weight-bold m-0">
-                            '. $pinjam->tanggal.'</p>
+                            '. date("d-F-Y", strtotime($pinjam->tanggal)).'
                     </td>
                     <td class="align-middle text-center text-sm">
-                        <p class="m-0 text-sm">'. $pinjam->ruangan->name .'</p>
+                        '. $pinjam->ruangan->name .'
                     </td>
                     <td class="align-middle text-center">
                         <a href="/sapras_pinjam/'.$pinjam->id.'" class="btn btn-primary btn-sm">
@@ -81,8 +79,7 @@ class PeminjamanController extends Controller
                         </a>
                     </td>
                     <td class="align-middle text-center">
-                        <span
-                            class="text-sm font-weight-bold text-capitalize">'. $pinjam->status .'</span>
+                        '. $pinjam->status .'
                     </td>
                     <td class="align-middle text-center">
                         <a href="#" id="'. $pinjam->id .'" class="btn btn-warning btn-sm editPinjam"><i
@@ -92,7 +89,27 @@ class PeminjamanController extends Controller
                     </td>
                 </tr>';
 			}
-			$output .= '</tbody></table>';
+			$output .= '</tbody>
+            <tfoot>
+            <tr>
+            <th>No.</th>
+            <th>
+                Name Peminjam
+            </th>
+            <th class="text-center">
+                Tanggal
+            </th>
+            <th class="text-center">
+                Ruangan
+            </th>
+            <th class="text-center">
+                Sapras
+            </th>
+            <th class="text-center">
+                Status
+            </th>
+            </tr>
+        </tfoot></table>';
 			echo $output;
 		} else {
 			echo '<h1 class="text-center text-secondary my-5">Tidak ada data Peminjaman!</h1>';
@@ -119,12 +136,6 @@ class PeminjamanController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validate($request,[
-            'qty[]' => 'required',
-        ], [
-            'qty[].required' => 'Kuantiti belum diisi!'
-        ]);
-
         $data_peminjam = new Peminjaman();
         $data_peminjam->user_id = $request->user_id;
         $data_peminjam->ruangan_id = $request->ruangan_id;

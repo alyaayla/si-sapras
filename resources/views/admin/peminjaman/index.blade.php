@@ -28,7 +28,7 @@
             <h6 class="m-0 font-weight-bold text-primary"></h6>
             <a href="{{route('peminjaman.create')}}" class="btn"><i class="fa fa-plus"></i> create</a>
         </div>
-        <div class="card-body"                                                                                          >
+        <div class="card-body">
             <div class="row align-items-center input-daterange mb-4">
                 <div class="col-md-4">
                     <input type="text" name="from_date" id="from_date" class="form-control" placeholder="Dari Tanggal"
@@ -67,7 +67,7 @@
         </div>
     </div>
 </div>
-<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+{{-- <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script> --}}
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 <!-- LIBARARY JS -->
@@ -231,7 +231,29 @@
                         columnDefs: [{
                             orderable: false,
                             targets: -1
-                        }]
+                        }],
+                        initComplete: function () {
+                        this.api()
+                            .columns()
+                            .every(function () {
+                                var column = this;
+                                var select = $('<select><option value=""></option></select>')
+                                    .appendTo($(column.footer()).empty())
+                                    .on('change', function () {
+                                        var val = $.fn.dataTable.util.escapeRegex($(this).val());
+            
+                                        column.search(val ? '^' + val + '$' : '', true, false).draw();
+                                    });
+            
+                                column
+                                    .data()
+                                    .unique()
+                                    .sort()
+                                    .each(function (d, j) {
+                                        select.append('<option value="' + d + '">' + d + '</option>');
+                                    });
+                            });
+                        },
                     });
                 }
             });
